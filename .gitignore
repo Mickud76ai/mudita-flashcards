@@ -1,0 +1,19 @@
+*.iml
+.gradle/
+/local.properties
+local.properties
+.DS_Store
+.idea/
+build/
+/app/build/
+/captures
+.externalNativeBuild
+.cxx
+*.apk
+*.aab
+*.keystore
+*.jks
+
+# Private planning docs — kept on disk only, never committed.
+/STATUS.md
+/Project Plan/

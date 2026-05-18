@@ -1,0 +1,65 @@
+package com.example.mudita_flashcards.data
+
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.os.Environment
+import android.provider.Settings
+import java.io.File
+
+const val FLASHCARDS_DIR_NAME = "Flashcards"
+
+@Suppress("DEPRECATION")
+fun getFlashcardsDir(): File? {
+    val externalRoot = Environment.getExternalStorageDirectory() ?: return null
+    return File(externalRoot, FLASHCARDS_DIR_NAME)
+}
+
+fun getFlashcardsDir(@Suppress("UNUSED_PARAMETER") context: Context): File? = getFlashcardsDir()
+
+fun hasFullStorageAccess(): Boolean = Environment.isExternalStorageManager()
+
+fun openManageStorageSettings(context: Context) {
+    val packageUri = Uri.parse("package:${context.packageName}")
+    val direct = Intent(
+        Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION,
+        packageUri,
+    ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    runCatching { context.startActivity(direct) }
+        .recoverCatching {
+            val fallback = Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            context.startActivity(fallback)
+        }
+}
+
+fun shouldIgnoreFile(file: File, rootDir: File): Boolean {
+    if (!file.name.endsWith(".csv", ignoreCase = true)) return true
+    if (file.name.equals("template.csv", ignoreCase = true) &&
+        file.parentFile?.canonicalPath == rootDir.canonicalPath) return true
+    return false
+}
+
+data class ScanResult(
+    val folders: List<BrowserItem.FolderItem>,
+    val decks: List<BrowserItem.DeckItem>,
+)
+
+fun scanDirectory(dir: File, rootDir: File): ScanResult {
+    val contents = dir.listFiles() ?: return ScanResult(emptyList(), emptyList())
+
+    val folders = contents
+        .filter { it.isDirectory }
+        .sortedBy { it.name.lowercase() }
+        .map { BrowserItem.FolderItem(name = it.name, path = it) }
+
+    val decks = contents
+        .filter { it.isFile && !shouldIgnoreFile(it, rootDir) }
+        .sortedBy { it.name.lowercase() }
+        .map { file ->
+            val (name, count) = quickParseCsvHeader(file)
+            BrowserItem.DeckItem(name = name, file = file, cardCount = count)
+        }
+
+    return ScanResult(folders = folders, decks = decks)
+}
