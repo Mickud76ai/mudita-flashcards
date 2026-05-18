@@ -63,3 +63,27 @@ fun scanDirectory(dir: File, rootDir: File): ScanResult {
 
     return ScanResult(folders = folders, decks = decks)
 }
+
+fun listAllDecks(rootDir: File): List<DeckListing> {
+    if (!rootDir.exists()) return emptyList()
+    return rootDir.walkTopDown()
+        .filter { it.isFile && !shouldIgnoreFile(it, rootDir) }
+        .map { file ->
+            val (name, _) = quickParseCsvHeader(file)
+            val relative = file.relativeTo(rootDir).path
+                .replace('\\', '/')
+                .removeSuffix(".csv")
+            DeckListing(file = file, deckName = name, displayPath = relative)
+        }
+        .sortedBy { it.displayPath.lowercase() }
+        .toList()
+}
+
+fun deleteDeck(context: Context, deckFile: File) {
+    val rootDir = getFlashcardsDir() ?: return
+    val relativePath = runCatching {
+        deckFile.relativeTo(rootDir).path.replace('\\', '/')
+    }.getOrNull() ?: deckFile.name
+    deckFile.delete()
+    deleteDeckProgress(context, relativePath)
+}

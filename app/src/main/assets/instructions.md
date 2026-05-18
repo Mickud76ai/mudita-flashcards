@@ -48,16 +48,15 @@ Flashcards/
 
 The app shows the folder hierarchy as navigation. You can move and rename folders through Windows Explorer (with the phone connected via USB-C), the app reflects the changes after refreshing the list.
 
-**Naming files and folders:** use letters, digits, underscores, and hyphens only. Avoid spaces and non-ASCII characters in file and folder names. In card content you can use any characters, including any language.
+**Naming files and folders:** the app itself handles any characters in file and folder names — Polish diacritics, Chinese, spaces, all work. For maximum portability when moving files between operating systems and MTP clients, ASCII letters, digits, underscores and hyphens are recommended. In card content (front and back), you can always use any characters, including any language.
 
-Good names:
+Recommended (most portable):
 - files: `mitosis.csv`, `biology-cell.csv`, `chapter_01.csv`
-- folders: `Biology`, `Chapter-1`, `Sailing`
+- folders: `Biology`, `Chapter-1`, `Zeglarz_Jachtowy`
 
-Bad names (avoid):
-- `Chapter 1.csv` (space)
-- `zeglarz.csv` (non-ASCII)
-- `Business English.csv` (space)
+Also works, slightly less portable:
+- `Chapter 1.csv` (space — some Linux tools need quoting)
+- `Żeglarz.csv` (non-ASCII — some older MTP clients may rename on copy)
 
 ---
 

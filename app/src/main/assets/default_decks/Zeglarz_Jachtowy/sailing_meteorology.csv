@@ -1,0 +1,41 @@
+Zeglarz jachtowy - meteorologia
+Wiatr rzeczywisty;Ruch powietrza względem powierzchni ziemi lub wody, niezależny od ruchu jachtu.
+Wiatr pozorny;Wiatr odczuwany na poruszającym się jachcie, suma wiatru rzeczywistego i wiatru wynikającego z ruchu jachtu.
+Bryza dzienna;Wiatr lokalny wiejący w dzień znad wody ku lądowi, bo ląd nagrzewa się szybciej.
+Bryza nocna;Wiatr lokalny wiejący nocą z lądu ku wodzie, bo ląd szybciej się wychładza.
+Szkwał;Nagły, krótki i silny wzrost prędkości wiatru, często połączony ze zmianą kierunku.
+Cisza;Stan, w którym wiatr jest bardzo słaby albo praktycznie nie występuje.
+Poryw wiatru;Chwilowy wzrost prędkości wiatru ponad wartość średnią.
+Kierunek wiatru;Kierunek, z którego wiatr wieje, na przykład wiatr północny wieje z północy.
+Prędkość wiatru;Szybkość przemieszczania się powietrza, podawana zwykle w m/s, km/h, węzłach lub stopniach Beauforta.
+Skala Beauforta;Umowna skala 0-12 opisująca siłę wiatru na podstawie prędkości i skutków na wodzie oraz lądzie.
+Izobara;Linia na mapie pogody łącząca punkty o takim samym ciśnieniu atmosferycznym.
+Niż baryczny;Obszar obniżonego ciśnienia, zwykle związany z chmurami, opadami i silniejszym wiatrem.
+Wyż baryczny;Obszar podwyższonego ciśnienia, często związany ze stabilniejszą pogodą i słabszym wiatrem.
+Front atmosferyczny;Granica między masami powietrza o różnych właściwościach, często daje chmury, opady i zmianę wiatru.
+Front chłodny;Front, za którym napływa chłodniejsze powietrze, często powoduje gwałtowne zjawiska i szkwały.
+Front ciepły;Front, za którym napływa cieplejsze powietrze, zwykle z warstwowym zachmurzeniem i dłuższym opadem.
+Front zokludowany;Front powstały po połączeniu frontu chłodnego i ciepłego, zwykle związany z niżem.
+Masa powietrza;Duża objętość powietrza o podobnej temperaturze i wilgotności.
+Ciśnienie atmosferyczne;Nacisk słupa powietrza na powierzchnię, mierzony zwykle w hektopaskalach.
+Spadek ciśnienia;Obniżanie ciśnienia w czasie, często zapowiada pogorszenie pogody lub zbliżanie się niżu.
+Wzrost ciśnienia;Podnoszenie ciśnienia w czasie, często zapowiada stabilizację pogody.
+Wilgotność powietrza;Ilość pary wodnej w powietrzu, ważna dla powstawania chmur, mgły i opadów.
+Punkt rosy;Temperatura, przy której para wodna zaczyna się skraplać i może tworzyć mgłę lub rosę.
+Mgła;Zawiesina drobnych kropelek wody przy powierzchni, ograniczająca widzialność poniżej 1 km.
+Zamglenie;Pogorszenie przejrzystości powietrza, słabsze od mgły, zwykle z widzialnością powyżej 1 km.
+Chmura cumulonimbus;Chmura burzowa o dużej rozbudowie pionowej, groźna przez szkwały, pioruny i silny opad.
+Chmury cumulus;Kłębiaste chmury dobrej pogody, ale przy silnym rozwoju mogą przechodzić w chmury burzowe.
+Chmury stratus;Niskie warstwowe chmury, często dają mżawkę i słabą widzialność.
+Chmury cirrus;Wysokie pierzaste chmury, mogą zapowiadać zmianę pogody i nadejście frontu.
+Burza;Zjawisko z wyładowaniami atmosferycznymi, zwykle z porywistym wiatrem i intensywnym opadem.
+Wał szkwałowy;Ciemna, niska strefa chmur przed burzą lub frontem, zapowiada silny nagły wiatr.
+Fala wiatrowa;Fala powstająca pod wpływem lokalnie wiejącego wiatru.
+Martwa fala;Fala, która utrzymuje się po ustaniu wiatru albo przyszła z innego obszaru.
+Widzialność;Maksymalna odległość, z której można rozpoznać obiekty na wodzie lub lądzie.
+Temperatura powietrza;Miara ciepła powietrza, istotna dla komfortu, ryzyka wychłodzenia i rozwoju pogody.
+Hipotermia;Niebezpieczne wychłodzenie organizmu, możliwe także latem po wpadnięciu do zimnej wody.
+Prognoza pogody;Przewidywanie warunków atmosferycznych na określony czas i obszar.
+Ostrzeżenie meteorologiczne;Komunikat o groźnych zjawiskach, takich jak burze, silny wiatr, mgła lub upał.
+Anemometr;Przyrząd do pomiaru prędkości wiatru.
+Barometr;Przyrząd do pomiaru ciśnienia atmosferycznego.

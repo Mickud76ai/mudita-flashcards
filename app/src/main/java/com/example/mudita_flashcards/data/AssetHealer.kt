@@ -48,5 +48,7 @@ fun ensureFlashcardsDirectoryReady(context: Context): Boolean {
             // Silent failure: next launch will try again. User's own decks remain unaffected.
         }
     }
+
+    installDefaultDecks(context, flashcardsDir)
     return true
 }

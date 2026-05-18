@@ -17,3 +17,7 @@ build/
 # Private planning docs — kept on disk only, never committed.
 /STATUS.md
 /Project Plan/
+
+# Author's source CSV files — the bundled, renamed copies live in
+# app/src/main/assets/default_decks/ and are public; the raw author folder is not.
+/Domyslne fiszki na start/

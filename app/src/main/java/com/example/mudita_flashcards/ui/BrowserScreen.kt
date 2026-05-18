@@ -2,12 +2,16 @@ package com.example.mudita_flashcards.ui
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -21,8 +25,10 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
@@ -47,6 +53,7 @@ fun BrowserScreen(
     onFolderClick: (File) -> Unit,
     onDeckClick: (File) -> Unit,
     onNavigateUp: () -> Unit,
+    onOpenSettings: () -> Unit,
 ) {
     val context = LocalContext.current
     val isRoot = currentPath.canonicalPath == rootPath.canonicalPath
@@ -79,11 +86,13 @@ fun BrowserScreen(
     }
 
     val result = scan
-    if (result != null && result.folders.isEmpty() && result.decks.isEmpty()) {
+    val isEmpty = result != null && result.folders.isEmpty() && result.decks.isEmpty()
+
+    if (isEmpty && !isRoot) {
         EmptyStateScreen(
-            title = if (isRoot) "Flashcards" else currentPath.name,
-            variant = if (isRoot) EmptyVariant.NoDecksFound else EmptyVariant.FolderEmpty,
-            showBack = !isRoot,
+            title = currentPath.name,
+            variant = EmptyVariant.FolderEmpty,
+            showBack = true,
             onBack = onNavigateUp,
         )
         return
@@ -110,9 +119,46 @@ fun BrowserScreen(
                         }
                     }
                 },
+                actions = {
+                    if (isRoot) {
+                        IconButton(onClick = onOpenSettings) {
+                            Icon(
+                                imageVector = Icons.Filled.Settings,
+                                contentDescription = "Settings",
+                            )
+                        }
+                    }
+                },
             )
         },
     ) { innerPadding ->
+        if (isEmpty) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .padding(horizontal = 24.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    TextMMD(
+                        text = "No decks found.",
+                        style = MaterialTheme.typography.titleMedium,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    TextMMD(
+                        text = "Connect Kompakt to a computer via USB-C and copy .csv files into the Flashcards folder. See instructions.md for details.",
+                        style = MaterialTheme.typography.bodySmall,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+            }
+            return@Scaffold
+        }
+
         Column(
             modifier = Modifier
                 .fillMaxSize()

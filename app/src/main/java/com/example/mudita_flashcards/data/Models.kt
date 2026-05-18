@@ -41,3 +41,35 @@ sealed class DeckLoadResult {
     data class ParseError(val fileName: String) : DeckLoadResult()
     data class IOError(val fileName: String) : DeckLoadResult()
 }
+
+enum class OrderMode(val label: String) {
+    Sequential("Sequential"),
+    Shuffle("Random"),
+    Smart("Smart"),
+}
+
+data class Settings(
+    val persistProgress: Boolean = false,
+    val orderMode: OrderMode = OrderMode.Smart,
+    val deepRefresh: Boolean = false,
+    val showCardWeights: Boolean = false,
+)
+
+data class CardProgressEntry(
+    val cardHash: String,
+    val timesShown: Int,
+    val isHard: Boolean,
+)
+
+data class DeckProgress(
+    val deckRelativePath: String,
+    val deckName: String,
+    val entries: Map<String, CardProgressEntry> = emptyMap(),
+    val lastSavedAt: Long = System.currentTimeMillis(),
+)
+
+data class DeckListing(
+    val file: File,
+    val deckName: String,
+    val displayPath: String,
+)
