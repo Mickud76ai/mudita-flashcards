@@ -4,8 +4,10 @@
 local.properties
 .DS_Store
 .idea/
+.kotlin/
 build/
 /app/build/
+/app/release/
 /captures
 .externalNativeBuild
 .cxx
@@ -17,6 +19,7 @@ build/
 # Private planning docs — kept on disk only, never committed.
 /STATUS.md
 /Project Plan/
+/CLAUDE_CODE_TASK.md
 
 # Author's source CSV files — the bundled, renamed copies live in
 # app/src/main/assets/default_decks/ and are public; the raw author folder is not.

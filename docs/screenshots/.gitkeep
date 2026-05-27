@@ -1,0 +1,15 @@
+# Screenshots from a physical Mudita Kompakt go here.
+#
+# Expected files (referenced by README.md):
+#   s1_browser.png       — deck browser (root)
+#   s3_card_front.png    — card session, front
+#   s4_card_back.png     — card session, back
+#   s5_empty.png         — empty state (variant A: "No decks found")
+#   s6_settings.png      — settings screen
+#   s9_browse.png        — browse mode (single card, read-only)
+#
+# How to capture from a device over ADB:
+#   adb shell screencap -p /sdcard/screen.png
+#   adb pull /sdcard/screen.png docs/screenshots/s1_browser.png
+#
+# Native resolution: 800x480 portrait. PNG, monochrome content but PNG colour mode is fine.

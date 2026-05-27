@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.mudita_flashcards"
+    namespace = "com.kompakt.flashcards"
     compileSdk {
         version = release(36) {
             minorApiLevel = 1
@@ -13,7 +13,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.mudita_flashcards"
+        applicationId = "com.kompakt.flashcards"
         minSdk = 31
         targetSdk = 36
         versionCode = 1

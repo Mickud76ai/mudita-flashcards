@@ -1,8 +1,50 @@
 # Mudita Flashcards
 
-A calm, deliberate flashcards app for the [Mudita Kompakt](https://mudita.com/products/phones/mudita-kompakt/) — an E Ink phone designed for digital well-being. Built with the [Mudita Mindful Design (MMD)](https://github.com/mudita/MMD) framework as an entry to the **Mudita Mindful App Design Challenge** (May–June 2026).
+![License](https://img.shields.io/badge/license-MIT-black)
+![Platform](https://img.shields.io/badge/platform-Mudita%20Kompakt-black)
+![MMD](https://img.shields.io/badge/MMD-1.0.1-black)
+![Kotlin](https://img.shields.io/badge/Kotlin-2.2.10-black)
+![minSdk](https://img.shields.io/badge/minSdk-31-black)
 
-> Spokojna nauka bez presji. — *Calm learning, no pressure.*
+A calm, deliberate flashcards app for the [Mudita Kompakt](https://mudita.com/products/phones/mudita-kompakt/), an E Ink phone designed for digital well-being. Built with the [Mudita Mindful Design (MMD)](https://github.com/mudita/MMD) framework as an entry to the **Mudita Mindful App Design Challenge** (May to June 2026).
+
+> Spokojna nauka bez presji. *Calm learning, no pressure.*
+
+---
+
+## Table of contents
+
+- [Quick start for reviewers](#quick-start-for-reviewers)
+- [Project Overview](#project-overview)
+  - [1. The problem we are answering](#1-the-problem-we-are-answering)
+  - [2. Mindful angle: "calm learning, no pressure"](#2-mindful-angle--calm-learning-no-pressure)
+  - [3. Bright Patterns: what we deliberately do not include, and why](#3-bright-patterns--what-we-deliberately-do-not-include-and-why)
+  - [4. Architecture and technical implementation](#4-architecture-and-technical-implementation)
+  - [5. E Ink design decisions](#5-e-ink-design-decisions)
+  - [6. Screens](#6-screens)
+  - [7. Creating decks](#7-creating-decks)
+- [Using the app](#using-the-app)
+- [Building from source](#building-from-source)
+- [Screenshots](#screenshots)
+- [How design decisions map to the judging criteria](#how-design-decisions-map-to-the-judging-criteria)
+- [Status](#status)
+- [Future scope](#future-scope)
+- [Acknowledgements](#acknowledgements)
+- [Licence](#licence)
+
+---
+
+## Quick start for reviewers
+
+For jury members and anyone evaluating the app:
+
+1. Build the APK with `./gradlew assembleDebug` (see [Building from source](#building-from-source) for the full sequence).
+2. Sideload onto a Mudita Kompakt via [WebADB](https://app.webadb.com/), or with `adb install app/build/outputs/apk/debug/app-debug.apk`.
+3. Open the app, tap *Open settings* on the permission screen, grant *All files access*, return to the app.
+4. The app installs three starter decks on first launch: Polish sailing terminology, English irregular verbs, digestive enzymes. Tap any deck (for example *English Irregular Verbs*), then tap *Start Session*.
+5. The session has no end. Leave whenever you choose, with the × in the top bar.
+
+That is the complete first-run sequence, intentionally short. Everything else, persistence, sort modes, deep refresh, browse mode, lives in Settings and is off by default.
 
 ---
 
@@ -41,10 +83,10 @@ A few patterns we *do* embrace, because they shift power toward the user:
 - **The algorithm is silent by default.** Weighted random sampling biases toward less-seen and "hard"-marked cards, but no weights or counts are shown — the work is invisible. (You can opt in to see the weights with a single toggle, if it helps your learning.)
 - **"Still learning" is a navigation tool, not a verdict.** Marking a card as hard biases sampling within this session only by default; it is forgotten when you leave, unless you opt in to persistence.
 - **You own the content.** Decks are CSV files on your phone. You create them on a computer, with AI or by hand, and copy them over USB-C. The app is a reader, not an editor or a curator.
-- **Self-healing help.** `template.csv` and `instructions.md` are restored to their original contents on every launch — you cannot accidentally lock yourself out of the help by deleting it.
+- **Self-healing help.** `how_to_create_decks.md` is restored to its original contents on every launch — you cannot accidentally lock yourself out of the help by deleting it.
 - **Grade-before-flip is allowed.** Both the "Still learning" (✗) and "Know" (✓) buttons are always visible — you can mark a card without flipping it if you already know the answer.
 - **Two modes of looking at a deck.** Tap a card in the list to read it (browse mode — no grading, no progress mutation). Tap "Start Session" to be tested. The first is for learning; the second is for self-assessment. You choose which one you need today.
-- **User autonomy through Settings.** Three behaviours — persistence between sessions, card order (Sequential / Random / Smart), and deep-refresh flash on screen transitions — are explicit user choices. Default off for all (mindful default), opt in when meaningful. No "Recommended" badges, no nagging.
+- **User autonomy through Settings.** Three behaviours — persistence between sessions, card order (Sequential / Smart), and deep-refresh flash on screen transitions — are explicit user choices. Default off for all (mindful default), opt in when meaningful. No "Recommended" badges, no nagging.
 - **Destructive actions require explicit confirmation.** Deleting a deck and disabling progress persistence both route to a full-screen confirm with a Cancel button. No modal dialog flashes; the choice is given the whole screen.
 
 ### 4. Architecture and technical implementation
@@ -56,10 +98,10 @@ A few patterns we *do* embrace, because they shift power toward the user:
 - **Storage.** Decks are CSV files at `/storage/emulated/0/Flashcards/` (top-level Internal Shared Storage, sitting next to `Documents`, `Music`, `Pictures` etc.). The app requests `MANAGE_EXTERNAL_STORAGE` once on first launch; after that, you copy CSV files in and out through Windows Explorer (or Android File Transfer / mtpfs on macOS / Linux) over USB-C. No proprietary tool, no Mudita Center step. Decks survive uninstall.
 - **Three storage layers, no SQL.** No Room, no SQLite. Session state lives in RAM. App settings live in `DataStore<Preferences>` (`flashcards_settings`). Optional per-card progress, when the user opts in, lives in plain JSON files at `context.filesDir/progress/<sha1>.json` (one per deck), serialised with `kotlinx-serialization-json`.
 - **CSV format.** Line 1 is the deck name; line 2 onward is `front;back`. Semicolons are reserved as the separator. UTF-8, optional BOM. Long sides (over 80 / 300 characters) are truncated with a visible `…` rather than rejected, so the user sees the signal without losing the card.
-- **Weighted random sampling (Smart mode).** `weight = 1 / (timesShown + 1) × (2.0 if marked hard, else 1.0)`. Never-seen cards get the highest priority; hard cards get double weight against equally-shown easy cards; the last-shown card is excluded from the next pick to prevent immediate repetition. Two other modes — Sequential (CSV order) and Random (uniform shuffle) — are also available in Settings.
+- **Weighted random sampling (Smart mode).** `weight = 1 / (timesShown + 1) × (2.0 if marked hard, else 1.0)`. Never-seen cards get the highest priority; hard cards get double weight against equally-shown easy cards; the last-shown card is excluded from the next pick to prevent immediate repetition. A second mode — Sequential (CSV order) — is also available in Settings.
 - **Immutable session state.** `SessionState` is a `data class` mutated only through `.copy()`. Per-card session state (`timesShown`, `isHard`) lives in a `Map<Int, CardSessionMeta>` keyed by index — `FlashCard` itself is pure content from disk. Compose recomposition is predictable because every change replaces the whole state.
 - **Card-content hash as progress key.** When persistence is enabled, each card's progress is keyed by SHA-1 of `front + " " + back`. Reordering cards in the CSV preserves history; editing a card's content gives that card a fresh start (the old entry becomes orphaned, which is fine).
-- **Self-healing managed assets.** `template.csv` and `instructions.md` are bundled as Android `assets/`. On every app launch and every return to the root folder, the app compares the SHA-256 hash of each file on disk with the bundled original and rewrites it if it has been deleted, edited or corrupted. The user's own decks are never touched.
+- **Self-healing managed asset.** `how_to_create_decks.md` is bundled as an Android asset. On every app launch and every return to the root folder, the app compares the SHA-256 hash of the file on disk with the bundled original and rewrites it if it has been deleted, edited or corrupted. The user's own decks are never touched. (Legacy `template.csv` and `instructions.md` from earlier versions are removed once, gated by a sentinel in internal storage.)
 - **Bundled starter decks.** A small set of starter decks (Polish sailing terminology, English irregular verbs, digestive enzymes) is bundled in `assets/default_decks/` and copied to `Flashcards/` once, on first permission grant. A versioned sentinel (`.defaults_installed_v1`) prevents re-installation after the user deletes them. They serve a dual purpose: they give a jury (or any new user) something to test the app with immediately, and they are a working example of correctly-formatted CSV files.
 - **On-resume rescan.** When the app returns to the foreground (after the user has uploaded files via USB), the deck list is rescanned automatically.
 
@@ -84,7 +126,7 @@ Ten screens in total:
 | S2 | Deck preview | Deck name, card count, scrollable list of card fronts (tap to browse), pinned "Start Session". Optional weight strip under each card when "Show card weights" is on. Optional mastery-aware sort when Smart + Persist are both on. |
 | S3/S4 | Card session | Single composable with `isFlipped`, slot-based, fixed-position grade buttons. "Flip the card" button on both states (toggle direction). Tap on the card body is a flip shortcut. |
 | S5 | Empty / error | Variants A (no decks), B (empty folder), C (broken CSV), D (zero cards), E (storage unavailable) |
-| S6 | Settings | Persistence toggle, card-order radio (Sequential / Random / Smart), deep-refresh toggle, show-card-weights toggle, "Delete decks" entry point |
+| S6 | Settings | "How to create a deck" entry, persistence toggle, card-order radio (Sequential / Smart), deep-refresh toggle, show-card-weights toggle, "Delete decks" entry point |
 | S7 | Delete decks | Flat list of all decks with a trash icon per row |
 | S8 | Delete confirm | Full-screen confirmation before deleting a single deck (Cancel / Delete) |
 | S9 | Browse mode | Open one card for reading. Back side shown first; tap to flip back to the front; "Return" exits. No grading, no progress mutation. |
@@ -104,7 +146,7 @@ Chinese, Basics
 再见;Goodbye (Zaijian)
 ```
 
-Full guidelines, including the recommended AI-assisted workflow (paste `instructions.md` into ChatGPT or Claude and ask for a deck on a topic), are bundled with the app as `instructions.md` and restored on every launch.
+Full guidelines, including the recommended AI-assisted workflow (paste `how_to_create_decks.md` into ChatGPT or Claude and ask for a deck on a topic), are bundled with the app as `how_to_create_decks.md` and restored on every launch.
 
 ---
 
@@ -114,7 +156,7 @@ Full guidelines, including the recommended AI-assisted workflow (paste `instruct
 
 1. Install the APK. Open the app — the first screen asks you to grant **All files access**. Tap *Open settings*, enable the toggle, return to the app.
 2. The app creates `/storage/emulated/0/Flashcards/` and copies into it:
-   - `template.csv` and `instructions.md` (the help, self-healing on every launch)
+   - `how_to_create_decks.md` (the help, self-healing on every launch)
    - A few starter decks (`Zeglarz_Jachtowy/sailing_*.csv`, `english_irregular_verbs.csv`, `digestive_enzymes.csv`)
 3. The home screen (S1) shows the decks. Foldery (`▸`) sit above plików (`≡`). Tap a folder to drill in, the back arrow to come up.
 
@@ -134,7 +176,7 @@ Tap a deck (`≡`) to open its preview (S2). From there:
 
 1. Connect the Kompakt to a computer with a USB-C cable.
 2. Open *Internal shared storage* → `Flashcards` in Windows Explorer (or Android File Transfer / mtpfs on macOS / Linux).
-3. Copy `.csv` files in. Sub-folders to any depth become the navigation tree in the app. The format is described in `instructions.md` (a file the app keeps in that same folder).
+3. Copy `.csv` files in. Sub-folders to any depth become the navigation tree in the app. The format is described in `how_to_create_decks.md` (a file the app keeps in that same folder).
 4. Switch back to the app — the list refreshes automatically.
 
 ### Settings (S6)
@@ -142,9 +184,8 @@ Tap a deck (`≡`) to open its preview (S2). From there:
 Open with the gear icon (⚙) on the home screen.
 
 - **Persist progress between sessions** — *off* by default. When on, each ○✗ / ○✓ rating is saved to internal app storage; the next session resumes from the saved state. Turning this off again opens a confirmation screen, because it wipes all saved progress and returns every card to weight 1.00.
-- **Card order** — *Smart* by default. Three options:
+- **Card order** — *Smart* by default. Two options:
   - **Sequential** — cards in CSV order, wrapping around.
-  - **Random** — uniform shuffle, the last shown card is excluded from the next pick.
   - **Smart** — weighted random favouring cards you haven't seen and cards you marked ○✗.
 - **Deep refresh on deck open** — *off* by default. When on, a brief full-screen black/white sequence runs before opening a deck preview, starting a session, and entering browse mode. Helps clear E Ink ghosting; cost is one extra ~360 ms transition.
 - **Show card weights on deck preview** — *off* by default. When on, a small `shown N× · hard/ok · w=0.XX` line appears under each card on the preview list. Useful when you want to see the algorithm at work; off otherwise.
@@ -154,8 +195,7 @@ Open with the gear icon (⚙) on the home screen.
 
 ```
 /storage/emulated/0/Flashcards/        — visible in Windows Explorer
-├── template.csv                       — self-healing, always present
-├── instructions.md                    — self-healing, always present
+├── how_to_create_decks.md             — self-healing, always present
 ├── Zeglarz_Jachtowy/                  — bundled starter
 │   ├── sailing_meteorology.csv
 │   ├── sailing_rules.csv
@@ -197,9 +237,33 @@ $env:JAVA_HOME = "C:\Program Files\Android\Android Studio\jbr"
 
 1. Install the APK on Kompakt.
 2. Open the app — the first screen asks you to grant **All files access**. Tap *Open settings*, enable the toggle, return to the app.
-3. The app creates `/storage/emulated/0/Flashcards/` with `template.csv` and `instructions.md` inside, and displays "No decks found".
+3. The app creates `/storage/emulated/0/Flashcards/` with `how_to_create_decks.md` inside, and displays "No decks found".
 4. Connect Kompakt to a computer via USB-C; the Flashcards folder is visible at the top of *Internal shared storage* in Windows Explorer. Copy your CSV decks (and sub-folders) into it.
 5. Return to the app — the list refreshes automatically.
+
+---
+
+## Screenshots
+
+All screenshots are from a physical Mudita Kompakt (4.3" E Ink, 800×480, portrait).
+
+| | | |
+|---|---|---|
+| ![Deck browser](docs/screenshots/s1_browser.png) | ![Card front](docs/screenshots/s3_card_front.png) | ![Card back](docs/screenshots/s4_card_back.png) |
+| Deck browser (S1) | Session, front (S3) | Session, back (S4) |
+| ![Empty state](docs/screenshots/s5_empty.png) | ![Settings](docs/screenshots/s6_settings.png) | ![Browse mode](docs/screenshots/s9_browse.png) |
+| Empty state (S5) | Settings (S6) | Browse mode (S9) |
+
+---
+
+## How design decisions map to the judging criteria
+
+| Criterion | Where it lives in this project |
+|---|---|
+| **1. Bright Patterns integration** | Section 3 of the overview (the Dark → Bright table). Every Settings toggle defaults to *off*. The session has no end screen. There are no notifications, no streaks, no points, no progress bar, no real-time statistics. Destructive actions go through full-screen confirms rather than modal flashes. |
+| **2. Creativity** | The slot-based session layout with fixed-position controls (one composable for front and back, zero centre-of-screen ghosting). The AI-first deck creation workflow (the app is a reader, not an editor). The self-healing `how_to_create_decks.md` managed by SHA-256. Browse mode as a separate, gradeless way into a deck. |
+| **3. Technical implementation** | Section 4. Single Activity, no ViewModel, no Room, no SQL. Every visible UI element is a Mudita Mindful Design component. Pure `MaterialTheme.colorScheme` (black and white only), Lato Medium typography throughout. SHA-1 card hashing keeps progress stable across CSV edits. DataStore Preferences for settings, plain JSON for opt-in progress. |
+| **4. E Ink usability and accessibility** | Section 5. Portrait lock, `LazyColumnMMD` step-scrolled lists, no animations, hierarchy through font size not colour or alpha, optional deep-refresh flash at significant transitions, visible controls beside any gesture shortcut. |
 
 ---
 
@@ -225,7 +289,9 @@ Out of scope for the MVP but planned for later iterations:
 
 - The [Mudita Mindful Design (MMD)](https://github.com/mudita/MMD) framework, open-sourced by Mudita in 2026, makes this app possible.
 - The [Mudita Mindful App Design Challenge](https://mudita.com/community/blog/announcing-the-mudita-mindful-app-design-challenge/) is the reason this project exists.
-- The community of Kompakt developers on [forum.mudita.com](https://forum.mudita.com) — especially the authors of CalmCast, einkMeditation, inkOS, KISS-eink and the many other E-Ink-first apps — set the bar for what a sideloaded app on this device can be.
+- The jury of the challenge, Tomasz Omelan, Mateusz Mróz, Harry Oaten, Kinga Skorupska, Dominika Worek and Adam Wierzbicki, for caring about how technology shapes attention.
+- [PJATK](https://pja.edu.pl/en/) (Polsko-Japońska Akademia Technik Komputerowych) for co-organising the challenge and contributing the academic perspective on Bright Patterns.
+- The community of Kompakt developers on [forum.mudita.com](https://forum.mudita.com), especially the authors of CalmCast, einkMeditation, inkOS, KISS-eink and the many other E Ink-first apps, set the bar for what a sideloaded app on this device can be.
 
 ## Licence
 
