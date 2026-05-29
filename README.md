@@ -8,7 +8,7 @@ A small flashcards app for the [Mudita Kompakt](https://mudita.com/products/phon
 
 > Spokojna nauka bez presji. *Calm learning, no pressure.*
 
-### [⬇ Download the APK (v1.0.1, 64 MB)](https://github.com/Mickud76ai/mudita-flashcards/releases/download/v1.0.1/mudita-flashcards-1.0-debug.apk)
+### [Download the APK (v1.0.1, 64 MB)](https://github.com/Mickud76ai/mudita-flashcards/releases/download/v1.0.1/mudita-flashcards-1.0-debug.apk)
 
 ## What it is
 
@@ -40,9 +40,21 @@ A few starter decks install on first launch: Polish sailing terminology (`Zeglar
 
 ## Create your own decks
 
-Decks are CSV files inside `/storage/emulated/0/Flashcards/` on the phone. Connect to a computer via USB-C and copy `.csv` files in. Sub-folders to any depth become the navigation tree.
+**The fastest path is an AI.** The app keeps a file called `how_to_create_decks.md` inside the `Flashcards` folder on the phone. That file is written for ChatGPT or Claude, not for you to read.
 
-Format: line 1 is the deck name, then `front;back` per line.
+Five steps to a new deck:
+
+1. Connect the phone to a computer over USB-C.
+2. Open the `Flashcards` folder, copy `how_to_create_decks.md` to the computer.
+3. Paste the file into an AI chat.
+4. Tell the AI what topic you want a deck on. It returns a CSV file in the correct Mudita Flashcards format.
+5. Copy the CSV back into `Flashcards/`. The app picks it up on the next refresh.
+
+If `how_to_create_decks.md` ever gets deleted, the app restores it on the next launch. There is no way to lock yourself out of the instructions.
+
+### Manual format
+
+For writing a deck by hand: line 1 is the deck name, then `front;back` per line.
 
 ```
 Chinese, Basics
@@ -51,7 +63,7 @@ Chinese, Basics
 再见;Goodbye (Zaijian)
 ```
 
-Full guidelines live inside the app as `how_to_create_decks.md`, restored on every launch.
+Place files anywhere inside `Flashcards/`. Sub-folders to any depth become the navigation tree in the app.
 
 ## Build from source
 
