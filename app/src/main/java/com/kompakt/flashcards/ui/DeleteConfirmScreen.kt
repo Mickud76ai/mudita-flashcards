@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.kompakt.flashcards.data.DeletionTarget
 import com.mudita.mmd.components.buttons.ButtonMMD
 import com.mudita.mmd.components.buttons.OutlinedButtonMMD
 import com.mudita.mmd.components.divider.HorizontalDividerMMD
@@ -32,17 +33,48 @@ import com.mudita.mmd.components.top_app_bar.TopAppBarMMD
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DeleteConfirmScreen(
-    deckName: String,
+    target: DeletionTarget,
+    persistProgressEnabled: Boolean,
     onCancel: () -> Unit,
     onConfirm: () -> Unit,
 ) {
     BackHandler { onCancel() }
+
+    val topBarTitle: String
+    val questionText: String
+    val primaryName: String
+    val subText: String?
+
+    when (target) {
+        is DeletionTarget.Deck -> {
+            topBarTitle = "Delete deck"
+            questionText = "Delete deck?"
+            primaryName = target.listing.deckName
+            val pathHint = target.listing.displayPath
+            subText = pathHint.takeIf { it.isNotBlank() && it != target.listing.deckName }
+        }
+        is DeletionTarget.Folder -> {
+            topBarTitle = "Delete folder"
+            questionText = "Delete folder?"
+            primaryName = target.folder.name
+            subText = when {
+                target.deckCount == 0 -> "Empty folder."
+                persistProgressEnabled && target.deckCount == 1 ->
+                    "Contains 1 deck. Saved progress will also be cleared."
+                persistProgressEnabled ->
+                    "Contains ${target.deckCount} decks. Saved progress will also be cleared."
+                target.deckCount == 1 -> "Contains 1 deck."
+                else -> "Contains ${target.deckCount} decks."
+            }
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBarMMD(
                 title = {
                     TextMMD(
-                        text = "Delete deck",
+                        text = topBarTitle,
                         style = MaterialTheme.typography.titleLarge,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
@@ -73,25 +105,27 @@ fun DeleteConfirmScreen(
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     TextMMD(
-                        text = "Delete",
+                        text = questionText,
                         style = MaterialTheme.typography.titleMedium,
                         textAlign = TextAlign.Center,
                         modifier = Modifier.fillMaxWidth(),
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
                     TextMMD(
-                        text = deckName,
+                        text = primaryName,
                         style = MaterialTheme.typography.bodyLarge,
                         textAlign = TextAlign.Center,
                         modifier = Modifier.fillMaxWidth(),
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    TextMMD(
-                        text = "?",
-                        style = MaterialTheme.typography.titleMedium,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.fillMaxWidth(),
-                    )
+                    if (subText != null) {
+                        Spacer(modifier = Modifier.height(12.dp))
+                        TextMMD(
+                            text = subText,
+                            style = MaterialTheme.typography.bodySmall,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
                 }
             }
 
@@ -105,13 +139,17 @@ fun DeleteConfirmScreen(
             ) {
                 OutlinedButtonMMD(
                     onClick = onCancel,
-                    modifier = Modifier.weight(1f).padding(end = 8.dp),
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(end = 8.dp),
                 ) {
                     TextMMD("Cancel")
                 }
                 ButtonMMD(
                     onClick = onConfirm,
-                    modifier = Modifier.weight(1f).padding(start = 8.dp),
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(start = 8.dp),
                 ) {
                     TextMMD("Delete")
                 }

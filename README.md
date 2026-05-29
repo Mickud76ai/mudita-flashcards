@@ -6,7 +6,7 @@
 ![Kotlin](https://img.shields.io/badge/Kotlin-2.2.10-black)
 ![minSdk](https://img.shields.io/badge/minSdk-31-black)
 
-A calm, deliberate flashcards app for the [Mudita Kompakt](https://mudita.com/products/phones/mudita-kompakt/), an E Ink phone designed for digital well-being. Built with the [Mudita Mindful Design (MMD)](https://github.com/mudita/MMD) framework as an entry to the **Mudita Mindful App Design Challenge** (May to June 2026).
+A calm, deliberate flashcards app for the [Mudita Kompakt](https://mudita.com/products/phones/mudita-kompakt/), an E Ink phone designed for digital well-being. Built with the [Mudita Mindful Design (MMD)](https://github.com/mudita/MMD) framework as an entry to the **Mudita Mindful App Design Challenge** (May to June 2026), Track A — new application.
 
 > Spokojna nauka bez presji. *Calm learning, no pressure.*
 
@@ -14,6 +14,7 @@ A calm, deliberate flashcards app for the [Mudita Kompakt](https://mudita.com/pr
 
 ## Table of contents
 
+- [Download and install](#download-and-install)
 - [Quick start for reviewers](#quick-start-for-reviewers)
 - [Project Overview](#project-overview)
   - [1. The problem we are answering](#1-the-problem-we-are-answering)
@@ -25,6 +26,7 @@ A calm, deliberate flashcards app for the [Mudita Kompakt](https://mudita.com/pr
   - [7. Creating decks](#7-creating-decks)
 - [Using the app](#using-the-app)
 - [Building from source](#building-from-source)
+- [Notes for developers](#notes-for-developers)
 - [Screenshots](#screenshots)
 - [How design decisions map to the judging criteria](#how-design-decisions-map-to-the-judging-criteria)
 - [Status](#status)
@@ -34,17 +36,30 @@ A calm, deliberate flashcards app for the [Mudita Kompakt](https://mudita.com/pr
 
 ---
 
+## Download and install
+
+A pre-built APK is attached to every [GitHub Release](https://github.com/Mickud76ai/mudita-flashcards/releases). The current release for the Mudita Mindful App Design Challenge is **[v1.0.0](https://github.com/Mickud76ai/mudita-flashcards/releases/tag/v1.0.0)**; download `mudita-flashcards-1.0-debug.apk` from the *Assets* section.
+
+To install on a Mudita Kompakt:
+
+- **Easiest** — open [Mudita Center](https://mudita.com/products/software-apps/mudita-center/), connect Kompakt via USB-C, drag the APK onto the app.
+- **Alternative** — open [WebADB](https://app.webadb.com/) in Chrome, connect Kompakt via USB-C (developer options + USB debugging enabled), use *Install APK*.
+- **For developers** — `adb install mudita-flashcards-1.0-debug.apk`.
+
+If you would rather build from source, see [Building from source](#building-from-source).
+
+---
+
 ## Quick start for reviewers
 
 For jury members and anyone evaluating the app:
 
-1. Build the APK with `./gradlew assembleDebug` (see [Building from source](#building-from-source) for the full sequence).
-2. Sideload onto a Mudita Kompakt via [WebADB](https://app.webadb.com/), or with `adb install app/build/outputs/apk/debug/app-debug.apk`.
-3. Open the app, tap *Open settings* on the permission screen, grant *All files access*, return to the app.
-4. The app installs three starter decks on first launch: Polish sailing terminology, English irregular verbs, digestive enzymes. Tap any deck (for example *English Irregular Verbs*), then tap *Start Session*.
-5. The session has no end. Leave whenever you choose, with the × in the top bar.
+1. Download `mudita-flashcards-1.0-debug.apk` from [Releases](https://github.com/Mickud76ai/mudita-flashcards/releases/tag/v1.0.0) and sideload onto a Mudita Kompakt via Mudita Center or WebADB (see [Download and install](#download-and-install) for the full instructions).
+2. Open the app, tap *Open settings* on the permission screen, grant *All files access*, return to the app.
+3. The app installs starter decks on first launch: Polish sailing terminology (folder `Zeglarz_Jachtowy/`), English irregular verbs and phrasal verbs (folder `Angielski/`), digestive enzymes. Tap into a folder, pick a deck (for example *English Irregular Verbs*), then tap *Start Session*.
+4. The session has no end. Leave whenever you choose, with the × in the top bar.
 
-That is the complete first-run sequence, intentionally short. Everything else, persistence, sort modes, deep refresh, browse mode, lives in Settings and is off by default.
+That is the complete first-run sequence, intentionally short. Everything else, persistence, sort modes, deep refresh, lives in Settings and is off by default.
 
 ---
 
@@ -85,7 +100,7 @@ A few patterns we *do* embrace, because they shift power toward the user:
 - **You own the content.** Decks are CSV files on your phone. You create them on a computer, with AI or by hand, and copy them over USB-C. The app is a reader, not an editor or a curator.
 - **Self-healing help.** `how_to_create_decks.md` is restored to its original contents on every launch — you cannot accidentally lock yourself out of the help by deleting it.
 - **Grade-before-flip is allowed.** Both the "Still learning" (✗) and "Know" (✓) buttons are always visible — you can mark a card without flipping it if you already know the answer.
-- **Two modes of looking at a deck.** Tap a card in the list to read it (browse mode — no grading, no progress mutation). Tap "Start Session" to be tested. The first is for learning; the second is for self-assessment. You choose which one you need today.
+- **The deck preview is non-interactive on purpose.** When opening a deck you see the list of card fronts, but rows are not tappable — the only way into a card is *Start Session*. An earlier iteration let you tap a row to peek at the back; user testing showed people would browse cards one by one and never start a session, missing the point of the app. Removing the tap target is a small loss of flexibility, a large gain in clarity.
 - **User autonomy through Settings.** Three behaviours — persistence between sessions, card order (Sequential / Smart), and deep-refresh flash on screen transitions — are explicit user choices. Default off for all (mindful default), opt in when meaningful. No "Recommended" badges, no nagging.
 - **Destructive actions require explicit confirmation.** Deleting a deck and disabling progress persistence both route to a full-screen confirm with a Cancel button. No modal dialog flashes; the choice is given the whole screen.
 
@@ -108,7 +123,7 @@ A few patterns we *do* embrace, because they shift power toward the user:
 ### 5. E Ink design decisions
 
 - **Portrait, 480 × 800.** MuditaOS K renders applications in portrait by default; the 800 × 480 panel is rotated. The activity is locked to `portrait`.
-- **Static layouts, no animations.** The only motion in the app is the optional *deep refresh flash* — a brief full-screen black/white sequence (~360 ms) used to clear ghosting at significant transitions (entering a deck, starting a session, opening browse mode). The flash is off by default and gated by a single toggle in Settings, so the app is also fully usable without any motion at all. There is no `animate*`, no `Crossfade`, no `AnimatedVisibility`.
+- **Static layouts, no animations.** The only motion in the app is the optional *deep refresh flash* — a brief full-screen black/white sequence (~360 ms) used to clear ghosting at significant transitions (entering a deck, starting a session). The flash is off by default and gated by a single toggle in Settings, so the app is also fully usable without any motion at all. There is no `animate*`, no `Crossfade`, no `AnimatedVisibility`.
 - **Slot-based layout for the session screen.** S3 (front) and S4 (back) are one composable with five fixed-height slots: top bar, echo of the front, card content (the only `weight(1f)` zone), the flip control, and the bottom bar. The card content's pixel position never shifts when you flip. On E Ink this is the difference between a clean transition and a smudge of ghosting in the centre of the screen.
 - **Buttons always present.** "Still learning" (✗) and "Know" (✓) are pinned in the `Scaffold` bottom bar across both states of the session screen — you can grade a card without ever flipping it. "Flip the card" is visible on both states too (toggles direction).
 - **Step-scrolled lists.** `LazyColumnMMD` provides discrete-step scrolling instead of continuous panning, which is what E Ink wants.
@@ -123,13 +138,12 @@ Ten screens in total:
 | ID | Name | Purpose |
 |---|---|---|
 | S1 | Browser | Current folder's contents — sub-folders prefixed `▸`, decks prefixed `≡`. Gear icon (⚙) opens Settings. |
-| S2 | Deck preview | Deck name, card count, scrollable list of card fronts (tap to browse), pinned "Start Session". Optional weight strip under each card when "Show card weights" is on. Optional mastery-aware sort when Smart + Persist are both on. |
-| S3/S4 | Card session | Single composable with `isFlipped`, slot-based, fixed-position grade buttons. "Flip the card" button on both states (toggle direction). Tap on the card body is a flip shortcut. |
+| S2 | Deck preview | Deck name, card count, scrollable list of card fronts as small MMD cards (non-interactive — see the design notes), pinned "Start Session". Optional weight strip under each card when "Show card weights" is on. Optional mastery-aware sort when Smart + Persist are both on. |
+| S3/S4 | Card session | Single composable with `isFlipped`, slot-based, fixed-position grade buttons. The card body is wrapped in `CardMMD`; "Flip the card" sits below the card as a separate action. Tap on the card body is also a flip shortcut. |
 | S5 | Empty / error | Variants A (no decks), B (empty folder), C (broken CSV), D (zero cards), E (storage unavailable) |
 | S6 | Settings | "How to create a deck" entry, persistence toggle, card-order radio (Sequential / Smart), deep-refresh toggle, show-card-weights toggle, "Delete decks" entry point |
-| S7 | Delete decks | Flat list of all decks with a trash icon per row |
-| S8 | Delete confirm | Full-screen confirmation before deleting a single deck (Cancel / Delete) |
-| S9 | Browse mode | Open one card for reading. Back side shown first; tap to flip back to the front; "Return" exits. No grading, no progress mutation. |
+| S7 | Delete decks | Navigable folder view: drill into folders, trash icon on every row deletes a single deck or a whole folder (recursive) |
+| S8 | Delete confirm | Full-screen confirmation before deleting a deck or folder (Cancel / Delete). For folders, body shows deck count and, when persistence is on, a note that saved progress will be cleared |
 | S10 | Persist disable confirm | Full-screen confirmation before turning persistence off (Cancel / Disable), because disabling wipes all progress and resets all weights to 1.00. |
 | — | Permission | One-time prompt to grant `MANAGE_EXTERNAL_STORAGE` so the Flashcards folder can live at the top level of internal storage |
 
@@ -157,20 +171,20 @@ Full guidelines, including the recommended AI-assisted workflow (paste `how_to_c
 1. Install the APK. Open the app — the first screen asks you to grant **All files access**. Tap *Open settings*, enable the toggle, return to the app.
 2. The app creates `/storage/emulated/0/Flashcards/` and copies into it:
    - `how_to_create_decks.md` (the help, self-healing on every launch)
-   - A few starter decks (`Zeglarz_Jachtowy/sailing_*.csv`, `english_irregular_verbs.csv`, `digestive_enzymes.csv`)
+   - A few starter decks (`Zeglarz_Jachtowy/sailing_*.csv`, `Angielski/english_irregular_verbs.csv`, `Angielski/phrasal_verbs_50.csv`, `digestive_enzymes.csv`)
 3. The home screen (S1) shows the decks. Foldery (`▸`) sit above plików (`≡`). Tap a folder to drill in, the back arrow to come up.
 
-### Two ways into a deck
+### Opening a deck
 
-Tap a deck (`≡`) to open its preview (S2). From there:
+Tap a deck (`≡`) to open its preview (S2). You see the deck name, the card count, and a list of card fronts shown as small cards. The list is **non-interactive on purpose** — see the design notes for why. The only way into a card is *Start Session*.
 
-- **Tap a card in the list** — opens the card in **browse mode** (S9). The back side is shown first because you already saw the front on the list. Tap the card body to flip, or use the "Flip the card" button. "Return" or the back arrow takes you to the list. Browse mode is for calm reading; it does not record any progress.
-- **Tap "Start Session"** — opens a session (S3/S4). Front of the card is shown. Three actions:
-  - **Tap "Flip the card"** or **tap the card body** — flips between front and back.
-  - **Tap ○✗ "Still learning"** — records the card as hard (boosts it in Smart mode) and shows the next card.
-  - **Tap ○✓ "Know"** — records the card as known and shows the next card.
-  
-  The session has no end. Leave whenever you want with **×** in the top bar, the back arrow, or the system back button.
+Tap **Start Session** (S3/S4). Front of the card is shown. Three actions:
+
+- **Tap "Flip the card"** or **tap the card body** — flips between front and back.
+- **Tap ○✗ "Still learning"** — records the card as hard (boosts it in Smart mode) and shows the next card.
+- **Tap ○✓ "Know"** — records the card as known and shows the next card.
+
+The session has no end. Leave whenever you want with **×** in the top bar, the back arrow, or the system back button.
 
 ### Adding your own decks
 
@@ -187,25 +201,27 @@ Open with the gear icon (⚙) on the home screen.
 - **Card order** — *Smart* by default. Two options:
   - **Sequential** — cards in CSV order, wrapping around.
   - **Smart** — weighted random favouring cards you haven't seen and cards you marked ○✗.
-- **Deep refresh on deck open** — *off* by default. When on, a brief full-screen black/white sequence runs before opening a deck preview, starting a session, and entering browse mode. Helps clear E Ink ghosting; cost is one extra ~360 ms transition.
+- **Deep refresh on deck open** — *off* by default. When on, a brief full-screen black/white sequence runs before opening a deck preview and starting a session. Helps clear E Ink ghosting; cost is one extra ~360 ms transition. See [Notes for developers](#notes-for-developers) for why this is implemented as a manual screen wipe rather than calling the system's gamma-mode refresh.
 - **Show card weights on deck preview** — *off* by default. When on, a small `shown N× · hard/ok · w=0.XX` line appears under each card on the preview list. Useful when you want to see the algorithm at work; off otherwise.
-- **Delete decks** — opens a flat list of all decks with a trash icon per row. Tapping the trash goes to a confirmation screen.
+- **Delete decks** — opens a navigable view of the `Flashcards/` folder. Each row has a trash icon. Tapping a folder name drills into it (the trash still sits on the row to delete the whole folder); tapping a deck row's trash deletes that one deck. Every deletion — empty folder, non-empty folder, single deck — routes to a full-screen confirmation with Cancel / Delete. Deleting a folder removes everything inside it recursively and clears any saved progress for the decks that lived there.
 
 ### Storage layout on the device
 
 ```
 /storage/emulated/0/Flashcards/        — visible in Windows Explorer
 ├── how_to_create_decks.md             — self-healing, always present
+├── Angielski/                         — bundled starter
+│   ├── english_irregular_verbs.csv
+│   └── phrasal_verbs_50.csv
 ├── Zeglarz_Jachtowy/                  — bundled starter
 │   ├── sailing_meteorology.csv
 │   ├── sailing_rules.csv
 │   └── sailing_yacht_parts.csv
 ├── digestive_enzymes.csv              — bundled starter
-├── english_irregular_verbs.csv        — bundled starter
 └── … your own decks here …            — copy via USB
 
-/data/data/com.example.mudita_flashcards/files/   — internal, invisible to Explorer
-├── .defaults_installed_v1             — sentinel: starter decks installed
+/data/data/com.kompakt.flashcards/files/          — internal, invisible to Explorer
+├── .defaults_installed_v2             — sentinel: starter decks installed
 └── progress/                          — only if "Persist progress" was ever on
     └── <sha1-of-deck-path>.json       — one file per deck
 ```
@@ -224,7 +240,7 @@ cd mudita-flashcards
 ./gradlew assembleDebug
 ```
 
-The debug APK is produced at `app/build/outputs/apk/debug/app-debug.apk`. Sideload onto Kompakt via [WebADB](https://app.webadb.com/) or `adb install`.
+The debug APK is produced at `app/build/outputs/apk/debug/mudita-flashcards-1.0-debug.apk`. Sideload onto Kompakt via [WebADB](https://app.webadb.com/) or `adb install`.
 
 On Windows, if you run Gradle outside Android Studio, set `JAVA_HOME` to the bundled JBR:
 
@@ -243,16 +259,38 @@ $env:JAVA_HOME = "C:\Program Files\Android\Android Studio\jbr"
 
 ---
 
+## Notes for developers
+
+A short list of constraints we ran into while building this app on the Mudita Kompakt, written down for anyone else writing for the platform. Nothing here changes how the app works — it documents *why* certain things are done the way they are.
+
+### E Ink refresh modes are not in the public API
+
+The Kompakt's display driver supports several refresh modes — `slow`, `fast`, `quality`, `gamma`, etc. The Mudita launcher and stock apps switch between them depending on context (e.g. the e-reader uses a slower, ghost-free mode). This is well-documented on `forum.mudita.com/t/e-ink-display-slow-vs-fast-modes/`.
+
+**These modes are not exposed to sideloaded apps.** They are tied to a system service (`Mudita Service`), which only other system apps can call. There is no MMD wrapper, no `Intent`, no broadcast — confirmed by multiple developers on the forum, and verified by inspecting MMD 1.0.1 sources (no refresh API anywhere). A workaround exists (call the system brightness dialog so the OS briefly treats your app as a system app), but it is fragile and ugly, and we did not pursue it.
+
+Our **deep refresh flash** (`DeepRefreshFlash.kt`) is a deliberate alternative: a full-screen black → white sequence drawn from Compose, ~360 ms, which forces the driver to propagate full-screen pixel changes even in fast mode. It uses only the public Compose surface, no reflection, no hidden APIs. The flash is off by default and gated by a Settings toggle; the app remains fully usable without any motion at all.
+
+If Mudita publishes a refresh-mode API in a future MMD release, we will switch to it.
+
+### MMD does not specify a launcher-icon shape
+
+The Mudita launcher does **not mask** application icons — every icon is rendered as-is, including its background. Despite this, MMD 1.0.1 contains **no specification** for icon canvas size, stroke, corner radius or symbol-area ratio. The only authoritative source we found is a forum post by Tomasz Omelan (UX Design Lead, Kompakt) at `forum.mudita.com/t/android-mudita-os-k-app-icon-templates/` (post #10, July 2025), which gives concrete numbers (canvas 81 × 81 px @ mdpi, symbol 40 × 40 px, stroke 2.5 px inside, corner radius 19 px).
+
+This is a real gap. The icon is the first thing a user sees on the launcher, and the only documentation lives in a single forum reply. A future MMD revision should provide an official `IconMMD` or at least a dimensions reference. For this project, we followed the forum spec and tuned the scale empirically (~67–75% of the adaptive-icon viewport).
+
+---
+
 ## Screenshots
 
-All screenshots are from a physical Mudita Kompakt (4.3" E Ink, 800×480, portrait).
+All screenshots are photographs of a physical Mudita Kompakt (4.3" E Ink, 800×480, portrait), cropped to the screen area.
 
 | | | |
 |---|---|---|
-| ![Deck browser](docs/screenshots/s1_browser.png) | ![Card front](docs/screenshots/s3_card_front.png) | ![Card back](docs/screenshots/s4_card_back.png) |
-| Deck browser (S1) | Session, front (S3) | Session, back (S4) |
-| ![Empty state](docs/screenshots/s5_empty.png) | ![Settings](docs/screenshots/s6_settings.png) | ![Browse mode](docs/screenshots/s9_browse.png) |
-| Empty state (S5) | Settings (S6) | Browse mode (S9) |
+| ![Deck browser](docs/screenshots/s1_browser.png) | ![Deck preview](docs/screenshots/s2_deck_preview.png) | ![Card back, English](docs/screenshots/s3_card_session_en.png) |
+| Deck browser (S1) | Deck preview (S2) | Session, back — English (S4) |
+| ![Card back, Polish](docs/screenshots/s4_card_back.png) | ![Settings](docs/screenshots/s6_settings.png) | ![How to create a deck](docs/screenshots/s6_how_to_create_deck.png) |
+| Session, back — Polish (S4) | Settings (S6) | How to create a deck (from Settings) |
 
 ---
 
@@ -261,7 +299,7 @@ All screenshots are from a physical Mudita Kompakt (4.3" E Ink, 800×480, portra
 | Criterion | Where it lives in this project |
 |---|---|
 | **1. Bright Patterns integration** | Section 3 of the overview (the Dark → Bright table). Every Settings toggle defaults to *off*. The session has no end screen. There are no notifications, no streaks, no points, no progress bar, no real-time statistics. Destructive actions go through full-screen confirms rather than modal flashes. |
-| **2. Creativity** | The slot-based session layout with fixed-position controls (one composable for front and back, zero centre-of-screen ghosting). The AI-first deck creation workflow (the app is a reader, not an editor). The self-healing `how_to_create_decks.md` managed by SHA-256. Browse mode as a separate, gradeless way into a deck. |
+| **2. Creativity** | The slot-based session layout with fixed-position controls (one composable for front and back, zero centre-of-screen ghosting). The AI-first deck creation workflow (the app is a reader, not an editor). The self-healing `how_to_create_decks.md` managed by SHA-256. The deliberately non-interactive deck preview that funnels users into starting a real session rather than browsing card-by-card. |
 | **3. Technical implementation** | Section 4. Single Activity, no ViewModel, no Room, no SQL. Every visible UI element is a Mudita Mindful Design component. Pure `MaterialTheme.colorScheme` (black and white only), Lato Medium typography throughout. SHA-1 card hashing keeps progress stable across CSV edits. DataStore Preferences for settings, plain JSON for opt-in progress. |
 | **4. E Ink usability and accessibility** | Section 5. Portrait lock, `LazyColumnMMD` step-scrolled lists, no animations, hierarchy through font size not colour or alpha, optional deep-refresh flash at significant transitions, visible controls beside any gesture shortcut. |
 
@@ -269,7 +307,7 @@ All screenshots are from a physical Mudita Kompakt (4.3" E Ink, 800×480, portra
 
 ## Status
 
-All MVP screens are implemented and the app runs on a physical Mudita Kompakt: deck browser, deck preview (with optional mastery sort and weights strip), the slot-based session screen, browse mode, settings panel, delete-deck flow, persist-disable confirm, permission onboarding. Self-healing assets and the bundled starter decks install on first run.
+All MVP screens are implemented and the app runs on a physical Mudita Kompakt: deck browser, deck preview (with optional mastery sort and weights strip), the slot-based session screen wrapped in `CardMMD`, settings panel, delete-deck flow, persist-disable confirm, permission onboarding. Self-healing assets and the bundled starter decks install on first run.
 
 Tuning likely after more device time: button sizes for thumb comfort, divider density on long lists, the exact slot heights for the session screen, the wording of the empty-state messages.
 
@@ -281,7 +319,6 @@ Out of scope for the MVP but planned for later iterations:
 - In-app deck editor for quick edits without a computer
 - Import from Anki `.apkg` and Quizlet exports
 - Search across decks
-- Browse-mode navigation (next / previous card without going back to the list)
 - Home-screen widget — a card of the day
 - ZIP backup of all decks into `Flashcards/_backup/`
 

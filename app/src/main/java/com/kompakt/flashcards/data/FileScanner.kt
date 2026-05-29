@@ -85,3 +85,21 @@ fun deleteDeck(context: Context, deckFile: File) {
     deckFile.delete()
     deleteDeckProgress(context, relativePath)
 }
+
+fun countDecksInFolder(folder: File, rootDir: File): Int =
+    folder.walkTopDown()
+        .filter { it.isFile && !shouldIgnoreFile(it, rootDir) }
+        .count()
+
+fun deleteFolder(context: Context, folder: File) {
+    val rootDir = getFlashcardsDir() ?: return
+    folder.walkTopDown()
+        .filter { it.isFile && !shouldIgnoreFile(it, rootDir) }
+        .forEach { csv ->
+            val rel = runCatching {
+                csv.relativeTo(rootDir).path.replace('\\', '/')
+            }.getOrNull() ?: csv.name
+            deleteDeckProgress(context, rel)
+        }
+    folder.deleteRecursively()
+}

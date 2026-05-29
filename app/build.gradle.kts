@@ -46,6 +46,17 @@ kotlin {
     }
 }
 
+// Produce a descriptive APK filename (mudita-flashcards-1.0-debug.apk) so the
+// artefact uploaded to GitHub Releases is self-identifying instead of the
+// gradle default app-debug.apk.
+androidComponents {
+    onVariants { variant ->
+        variant.outputs.forEach { output ->
+            output.outputFileName.set("mudita-flashcards-1.0-${variant.name}.apk")
+        }
+    }
+}
+
 dependencies {
     implementation("com.mudita:MMD:1.0.1")
     implementation(platform(libs.androidx.compose.bom))

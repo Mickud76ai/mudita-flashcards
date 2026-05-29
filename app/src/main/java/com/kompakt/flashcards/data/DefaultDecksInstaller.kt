@@ -6,7 +6,7 @@ import java.io.File
 import java.io.IOException
 
 private const val DEFAULTS_ASSET_ROOT = "default_decks"
-private const val DEFAULTS_VERSION = "v1"
+private const val DEFAULTS_VERSION = "v2"
 private const val SENTINEL_FILENAME = ".defaults_installed_$DEFAULTS_VERSION"
 
 private fun defaultsInstalled(context: Context): Boolean =

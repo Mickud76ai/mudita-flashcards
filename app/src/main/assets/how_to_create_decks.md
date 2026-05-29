@@ -82,6 +82,7 @@ Mudita Kompakt displays apps in portrait orientation. Effective working area is 
 - maximum 80 characters
 - best as a single word, a short sentence, or a question
 - avoid lists and bullet points, this is the question side
+- **on the deck preview list, side A is shown on a single line and truncated with `...` if it does not fit** — this is intentional, the goal is to keep as many cards visible at once as possible, even when some fronts are long. The full text is always readable inside a session.
 
 **Side B (back of the card, answer, definition, translation):**
 - maximum 300 characters

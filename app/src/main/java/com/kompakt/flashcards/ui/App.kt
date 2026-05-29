@@ -11,11 +11,11 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import com.kompakt.flashcards.data.Deck
-import com.kompakt.flashcards.data.DeckListing
-import com.kompakt.flashcards.data.FlashCard
+import com.kompakt.flashcards.data.DeletionTarget
 import com.kompakt.flashcards.data.Settings
 import com.kompakt.flashcards.data.clearAllDeckProgress
 import com.kompakt.flashcards.data.deleteDeck
+import com.kompakt.flashcards.data.deleteFolder
 import com.kompakt.flashcards.data.ensureFlashcardsDirectoryReady
 import com.kompakt.flashcards.data.getFlashcardsDir
 import com.kompakt.flashcards.data.hasFullStorageAccess
@@ -30,13 +30,12 @@ import java.io.File
 sealed class Screen {
     data class Browser(val path: File) : Screen()
     data class DeckPreview(val deckFile: File) : Screen()
-    data class CardBrowse(val card: FlashCard, val deckName: String, val deckFile: File) : Screen()
     data class Session(val deck: Deck) : Screen()
     data object Settings : Screen()
     data object HowToCreateDeck : Screen()
     data object PersistDisableConfirm : Screen()
-    data object DeleteDecks : Screen()
-    data class DeleteConfirm(val listing: DeckListing) : Screen()
+    data class DeleteDecks(val path: File) : Screen()
+    data class DeleteConfirm(val target: DeletionTarget, val returnTo: File) : Screen()
 }
 
 @Composable
@@ -108,15 +107,6 @@ fun FlashcardsApp() {
                 current = Screen.Browser(parent)
             },
             onStartSession = { deck -> current = Screen.Session(deck) },
-            onCardTap = { deck, card ->
-                current = Screen.CardBrowse(card, deck.name, deck.sourceFile)
-            },
-        )
-        is Screen.CardBrowse -> CardBrowseScreen(
-            card = screen.card,
-            deckName = screen.deckName,
-            settings = settings,
-            onReturn = { current = Screen.DeckPreview(screen.deckFile) },
         )
         is Screen.Session -> CardSessionScreen(
             initialDeck = screen.deck,
@@ -127,7 +117,7 @@ fun FlashcardsApp() {
             settings = settings,
             onSettingsChange = onSettingsChange,
             onBack = { current = Screen.Browser(rootDir) },
-            onDeleteDecks = { current = Screen.DeleteDecks },
+            onDeleteDecks = { current = Screen.DeleteDecks(rootDir) },
             onOpenHowTo = { current = Screen.HowToCreateDeck },
         )
         is Screen.HowToCreateDeck -> HowToCreateDeckScreen(
@@ -146,20 +136,45 @@ fun FlashcardsApp() {
             },
         )
         is Screen.DeleteDecks -> DeleteDecksScreen(
+            currentPath = screen.path,
+            rootPath = rootDir,
             refreshKey = deleteRefreshKey,
-            onBack = { current = Screen.Settings },
-            onDeckSelected = { listing -> current = Screen.DeleteConfirm(listing) },
+            onBack = {
+                if (screen.path.canonicalPath == rootDir.canonicalPath) {
+                    current = Screen.Settings
+                } else {
+                    val parent = screen.path.parentFile ?: rootDir
+                    current = Screen.DeleteDecks(parent)
+                }
+            },
+            onFolderDrill = { folder -> current = Screen.DeleteDecks(folder) },
+            onDeckDelete = { listing ->
+                current = Screen.DeleteConfirm(
+                    target = DeletionTarget.Deck(listing),
+                    returnTo = screen.path,
+                )
+            },
+            onFolderDelete = { folder, count ->
+                current = Screen.DeleteConfirm(
+                    target = DeletionTarget.Folder(folder, count),
+                    returnTo = screen.path,
+                )
+            },
         )
         is Screen.DeleteConfirm -> DeleteConfirmScreen(
-            deckName = screen.listing.deckName,
-            onCancel = { current = Screen.DeleteDecks },
+            target = screen.target,
+            persistProgressEnabled = settings.persistProgress,
+            onCancel = { current = Screen.DeleteDecks(screen.returnTo) },
             onConfirm = {
                 scope.launch {
                     withContext(Dispatchers.IO) {
-                        deleteDeck(context, screen.listing.file)
+                        when (val t = screen.target) {
+                            is DeletionTarget.Deck -> deleteDeck(context, t.listing.file)
+                            is DeletionTarget.Folder -> deleteFolder(context, t.folder)
+                        }
                     }
                     deleteRefreshKey++
-                    current = Screen.DeleteDecks
+                    current = Screen.DeleteDecks(screen.returnTo)
                 }
             },
         )

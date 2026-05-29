@@ -28,9 +28,9 @@ import com.mudita.mmd.components.text.TextMMD
 import com.mudita.mmd.components.top_app_bar.TopAppBarMMD
 
 private const val HOW_TO_BODY =
-    "In order to create a new deck, connect your Kompakt phone to your laptop and open Flashcards folder on your Kompakt phone.\n\n" +
-    "Download how_to_create_decks.md and upload it to an AI of your choice.\n\n" +
-    "You don't need to read it. Just upload and tell AI what's the topic.\n\n" +
+    "In order to create a new deck, connect your Kompakt phone to your laptop and open the Flashcards folder on your Kompakt phone.\n\n" +
+    "Open how_to_create_decks.md and upload it to an AI of your choice.\n\n" +
+    "You don't need to read it. Just upload and tell the AI what the topic is.\n\n" +
     "Simple as that. No hassle."
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -80,7 +80,7 @@ fun HowToCreateDeckScreen(
                 )
                 Spacer(modifier = Modifier.height(24.dp))
                 TextMMD(
-                    text = "Autor: Michal Kudraszew",
+                    text = "By Michał Kudraszew",
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.fillMaxWidth(),
                 )

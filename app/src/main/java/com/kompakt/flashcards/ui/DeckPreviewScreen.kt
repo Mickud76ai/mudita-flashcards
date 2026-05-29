@@ -1,7 +1,6 @@
 package com.kompakt.flashcards.ui
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -34,6 +33,7 @@ import com.kompakt.flashcards.data.deckRelativePath
 import com.kompakt.flashcards.data.loadDeck
 import com.kompakt.flashcards.data.loadDeckProgress
 import com.mudita.mmd.components.buttons.ButtonMMD
+import com.mudita.mmd.components.cards.CardMMD
 import com.mudita.mmd.components.divider.HorizontalDividerMMD
 import com.mudita.mmd.components.lazy.LazyColumnMMD
 import com.mudita.mmd.components.text.TextMMD
@@ -49,7 +49,6 @@ fun DeckPreviewScreen(
     settings: Settings,
     onBack: () -> Unit,
     onStartSession: (Deck) -> Unit,
-    onCardTap: (Deck, FlashCard) -> Unit,
 ) {
     BackHandler { onBack() }
     val context = LocalContext.current
@@ -71,7 +70,7 @@ fun DeckPreviewScreen(
     }
 
     androidx.compose.foundation.layout.Box(modifier = Modifier.fillMaxSize()) {
-        DeckPreviewContent(deckFile, loadResult, cardRows, onBack, onStartSession, onCardTap)
+        DeckPreviewContent(deckFile, loadResult, cardRows, onBack, onStartSession)
         if (settings.deepRefresh) {
             DeepRefreshFlash(triggerKey = deckFile.absolutePath)
         }
@@ -135,7 +134,6 @@ private fun DeckPreviewContent(
     cardRows: List<CardRow>?,
     onBack: () -> Unit,
     onStartSession: (Deck) -> Unit,
-    onCardTap: (Deck, FlashCard) -> Unit,
 ) {
     when (val result = loadResult) {
         null -> {
@@ -179,7 +177,6 @@ private fun DeckPreviewContent(
                 emptyMessage = "This deck has no cards yet.",
                 onBack = onBack,
                 onStartSession = null,
-                onCardTap = {},
             )
         }
         is DeckLoadResult.Success -> {
@@ -189,7 +186,6 @@ private fun DeckPreviewContent(
                 emptyMessage = null,
                 onBack = onBack,
                 onStartSession = { onStartSession(result.deck) },
-                onCardTap = { card -> onCardTap(result.deck, card) },
             )
         }
     }
@@ -203,7 +199,6 @@ private fun DeckBody(
     emptyMessage: String?,
     onBack: () -> Unit,
     onStartSession: (() -> Unit)?,
-    onCardTap: (FlashCard) -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -258,6 +253,12 @@ private fun DeckBody(
                     )
                 }
             } else {
+                // Card list is intentionally non-interactive: each row shows only the
+                // front of the card, single line, ellipsised if it overflows. We tested
+                // an alternative where tapping a row opened the back — testers then
+                // browsed cards one by one and never tapped Start Session, missing the
+                // point of the app. Truncation is the deliberate trade-off to keep more
+                // cards visible at once; the back is only revealed inside a real session.
                 LazyColumnMMD(
                     modifier = Modifier
                         .weight(1f)
@@ -265,18 +266,19 @@ private fun DeckBody(
                 ) {
                     items(rows.size) { idx ->
                         val row = rows[idx]
-                        Column(
+                        CardMMD(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .clickable { onCardTap(row.card) }
-                                .padding(horizontal = 16.dp, vertical = 10.dp),
+                                .padding(horizontal = 16.dp, vertical = 4.dp),
                         ) {
                             TextMMD(
                                 text = row.card.front,
                                 style = MaterialTheme.typography.bodyMedium,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
-                                modifier = Modifier.fillMaxWidth(),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 12.dp, vertical = 10.dp),
                             )
                             if (row.debugInfo != null) {
                                 TextMMD(
@@ -284,11 +286,12 @@ private fun DeckBody(
                                     style = MaterialTheme.typography.bodySmall,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis,
-                                    modifier = Modifier.fillMaxWidth(),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 12.dp, vertical = 2.dp),
                                 )
                             }
                         }
-                        HorizontalDividerMMD()
                     }
                 }
             }

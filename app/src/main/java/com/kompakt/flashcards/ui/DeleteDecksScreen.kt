@@ -1,6 +1,7 @@
 package com.kompakt.flashcards.ui
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,35 +25,40 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.kompakt.flashcards.data.DeckListing
-import com.kompakt.flashcards.data.getFlashcardsDir
-import com.kompakt.flashcards.data.listAllDecks
+import com.kompakt.flashcards.data.ScanResult
+import com.kompakt.flashcards.data.countDecksInFolder
+import com.kompakt.flashcards.data.scanDirectory
 import com.mudita.mmd.components.divider.HorizontalDividerMMD
 import com.mudita.mmd.components.lazy.LazyColumnMMD
 import com.mudita.mmd.components.text.TextMMD
 import com.mudita.mmd.components.top_app_bar.TopAppBarMMD
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DeleteDecksScreen(
+    currentPath: File,
+    rootPath: File,
     refreshKey: Int,
     onBack: () -> Unit,
-    onDeckSelected: (DeckListing) -> Unit,
+    onFolderDrill: (File) -> Unit,
+    onDeckDelete: (DeckListing) -> Unit,
+    onFolderDelete: (folder: File, deckCount: Int) -> Unit,
 ) {
     BackHandler { onBack() }
-    val context = LocalContext.current
-    var decks by remember { mutableStateOf<List<DeckListing>?>(null) }
+    val isRoot = currentPath.canonicalPath == rootPath.canonicalPath
 
-    LaunchedEffect(refreshKey) {
-        decks = withContext(Dispatchers.IO) {
-            val rootDir = getFlashcardsDir() ?: return@withContext emptyList()
-            listAllDecks(rootDir)
+    var scan by remember(currentPath) { mutableStateOf<ScanResult?>(null) }
+
+    LaunchedEffect(currentPath, refreshKey) {
+        scan = withContext(Dispatchers.IO) {
+            scanDirectory(currentPath, rootPath)
         }
     }
 
@@ -61,7 +67,7 @@ fun DeleteDecksScreen(
             TopAppBarMMD(
                 title = {
                     TextMMD(
-                        text = "Delete decks",
+                        text = if (isRoot) "Delete decks" else currentPath.name,
                         style = MaterialTheme.typography.titleLarge,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
@@ -78,8 +84,10 @@ fun DeleteDecksScreen(
             )
         },
     ) { innerPadding ->
-        val list = decks
-        if (list != null && list.isEmpty()) {
+        val result = scan
+        val isEmpty = result != null && result.folders.isEmpty() && result.decks.isEmpty()
+
+        if (isEmpty) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -88,7 +96,7 @@ fun DeleteDecksScreen(
                 contentAlignment = Alignment.Center,
             ) {
                 TextMMD(
-                    text = "No decks to delete.",
+                    text = if (isRoot) "No decks to delete." else "Folder is empty.",
                     style = MaterialTheme.typography.bodyLarge,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth(),
@@ -102,13 +110,34 @@ fun DeleteDecksScreen(
                 .fillMaxSize()
                 .padding(innerPadding),
         ) {
-            if (list == null) return@Column
+            if (result == null) return@Column
             LazyColumnMMD(modifier = Modifier.fillMaxSize()) {
-                items(list.size) { idx ->
-                    val deck = list[idx]
-                    DeckRow(
-                        listing = deck,
-                        onDelete = { onDeckSelected(deck) },
+                items(result.folders.size) { idx ->
+                    val folder = result.folders[idx]
+                    FolderDeleteRow(
+                        name = folder.name,
+                        onDrill = { onFolderDrill(folder.path) },
+                        onDelete = {
+                            val count = countDecksInFolder(folder.path, rootPath)
+                            onFolderDelete(folder.path, count)
+                        },
+                    )
+                    HorizontalDividerMMD()
+                }
+                items(result.decks.size) { idx ->
+                    val deck = result.decks[idx]
+                    val listing = DeckListing(
+                        file = deck.file,
+                        deckName = deck.name,
+                        displayPath = runCatching {
+                            deck.file.relativeTo(rootPath).path
+                                .replace('\\', '/')
+                                .removeSuffix(".csv")
+                        }.getOrDefault(deck.name),
+                    )
+                    DeckDeleteRow(
+                        listing = listing,
+                        onDelete = { onDeckDelete(listing) },
                     )
                     HorizontalDividerMMD()
                 }
@@ -118,24 +147,52 @@ fun DeleteDecksScreen(
 }
 
 @Composable
-private fun DeckRow(listing: DeckListing, onDelete: () -> Unit) {
+private fun FolderDeleteRow(
+    name: String,
+    onDrill: () -> Unit,
+    onDelete: () -> Unit,
+) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 16.dp, end = 4.dp, top = 8.dp, bottom = 8.dp),
+        modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
-        Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
-            TextMMD(
-                text = listing.deckName,
-                style = MaterialTheme.typography.bodyLarge,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
+        TextMMD(
+            text = "▸  $name",
+            style = MaterialTheme.typography.bodyLarge,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier
+                .weight(1f)
+                .clickable(onClick = onDrill)
+                .padding(start = 16.dp, end = 8.dp, top = 16.dp, bottom = 16.dp),
+        )
+        IconButton(onClick = onDelete) {
+            Icon(
+                imageVector = Icons.Filled.Delete,
+                contentDescription = "Delete folder $name",
             )
+        }
+    }
+}
+
+@Composable
+private fun DeckDeleteRow(listing: DeckListing, onDelete: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 16.dp, end = 4.dp, top = 12.dp, bottom = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+    ) {
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .padding(end = 8.dp),
+        ) {
             TextMMD(
-                text = listing.displayPath,
-                style = MaterialTheme.typography.bodySmall,
+                text = "≡  ${listing.deckName}",
+                style = MaterialTheme.typography.bodyLarge,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )

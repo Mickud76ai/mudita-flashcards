@@ -72,3 +72,8 @@ data class DeckListing(
     val deckName: String,
     val displayPath: String,
 )
+
+sealed class DeletionTarget {
+    data class Deck(val listing: DeckListing) : DeletionTarget()
+    data class Folder(val folder: File, val deckCount: Int) : DeletionTarget()
+}

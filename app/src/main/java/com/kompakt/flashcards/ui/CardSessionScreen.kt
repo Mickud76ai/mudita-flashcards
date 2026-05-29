@@ -38,6 +38,7 @@ import com.kompakt.flashcards.data.advance
 import com.kompakt.flashcards.data.startSession
 import com.mudita.mmd.components.buttons.ButtonMMD
 import com.mudita.mmd.components.buttons.OutlinedButtonMMD
+import com.mudita.mmd.components.cards.CardMMD
 import com.mudita.mmd.components.divider.HorizontalDividerMMD
 import com.mudita.mmd.components.text.TextMMD
 import com.mudita.mmd.components.top_app_bar.TopAppBarMMD
@@ -144,40 +145,48 @@ fun CardSessionScreen(
                     }
                 }
 
-                // Slot 3 — Card content. Tap to flip (Quizlet/Anki convention).
-                Box(
+                // Card body — only the front/back text lives inside CardMMD. The flip
+                // button sits below as a separate action on the card, mirroring the
+                // Quizlet/Anki convention and keeping the card itself visually pure
+                // (just content, no embedded controls). Tap on the text region also
+                // flips, the button is the explicit fallback.
+                CardMMD(
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxWidth()
-                        .clickable { isFlipped = !isFlipped }
-                        .padding(horizontal = 24.dp),
-                    contentAlignment = Alignment.Center,
+                        .padding(horizontal = 12.dp, vertical = 8.dp),
                 ) {
-                    TextMMD(
-                        text = if (isFlipped) state.currentCard.back else state.currentCard.front,
-                        style = if (isFlipped) MaterialTheme.typography.bodyLarge
-                        else MaterialTheme.typography.titleLarge,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.fillMaxWidth(),
-                    )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clickable { isFlipped = !isFlipped }
+                            .padding(horizontal = 16.dp),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        TextMMD(
+                            text = if (isFlipped) state.currentCard.back else state.currentCard.front,
+                            style = if (isFlipped) MaterialTheme.typography.bodyLarge
+                            else MaterialTheme.typography.titleLarge,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
                 }
 
-                // Slot 4 — Flip slot. Button always visible, label adapts to direction.
+                // Slot 4 — Flip button, outside the card.
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(flipSlotHeight),
+                    contentAlignment = Alignment.Center,
                 ) {
-                    Column(modifier = Modifier.fillMaxSize()) {
-                        HorizontalDividerMMD()
-                        OutlinedButtonMMD(
-                            onClick = { isFlipped = !isFlipped },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp, vertical = 8.dp),
-                        ) {
-                            TextMMD("Flip the card")
-                        }
+                    OutlinedButtonMMD(
+                        onClick = { isFlipped = !isFlipped },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                    ) {
+                        TextMMD("Flip the card")
                     }
                 }
             }

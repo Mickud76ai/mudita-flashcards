@@ -71,7 +71,7 @@ fun SettingsScreen(
                 .fillMaxSize()
                 .padding(innerPadding),
         ) {
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(6.dp))
             OutlinedButtonMMD(
                 onClick = onOpenHowTo,
                 modifier = Modifier
@@ -80,7 +80,7 @@ fun SettingsScreen(
             ) {
                 TextMMD("How to create a deck")
             }
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(6.dp))
             HorizontalDividerMMD()
 
             SettingsToggleRow(
@@ -110,7 +110,7 @@ fun SettingsScreen(
             )
             HorizontalDividerMMD()
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             OutlinedButtonMMD(
                 onClick = onDeleteDecks,
@@ -120,6 +120,7 @@ fun SettingsScreen(
             ) {
                 TextMMD("Delete decks")
             }
+            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }
@@ -133,7 +134,7 @@ private fun SettingsToggleRow(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 14.dp),
+            .padding(horizontal = 16.dp, vertical = 12.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -158,7 +159,7 @@ private fun OrderModeSection(
         TextMMD(
             text = "Card order",
             style = MaterialTheme.typography.bodySmall,
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
         )
         OrderMode.entries.forEach { mode ->
             Row(
