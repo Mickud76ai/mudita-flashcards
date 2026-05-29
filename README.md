@@ -8,18 +8,22 @@ A small flashcards app for the [Mudita Kompakt](https://mudita.com/products/phon
 
 > Spokojna nauka bez presji. *Calm learning, no pressure.*
 
+### [⬇ Download the APK (v1.0.1, 64 MB)](https://github.com/Mickud76ai/mudita-flashcards/releases/download/v1.0.1/mudita-flashcards-1.0-debug.apk)
+
 ## What it is
 
 A reader for flashcard decks kept on the phone as CSV files. No timers, no streaks, no notifications, no points. Sessions have no end; you stop when you want. The role is a quiet study notebook for the moments you choose to learn, not a game that tries to keep you coming back.
 
 ## Install
 
-Download `mudita-flashcards-1.0-debug.apk` from [Releases](https://github.com/Mickud76ai/mudita-flashcards/releases/tag/v1.0.1) and sideload onto a Kompakt:
+Sideload the APK onto a Kompakt:
 
 - via [Mudita Center](https://mudita.com/products/software-apps/mudita-center/): drag the APK onto the connected phone.
 - via [WebADB](https://app.webadb.com/) in Chrome: use *Install APK*.
 
 On first launch, grant *All files access* in the permission screen.
+
+Older versions and changelogs live on the [Releases page](https://github.com/Mickud76ai/mudita-flashcards/releases).
 
 ## How to use
 

@@ -1,30 +1,26 @@
+# Android build outputs and caches.
 *.iml
 .gradle/
-/local.properties
-local.properties
-.DS_Store
-.idea/
-.kotlin/
 build/
 /app/build/
 /app/release/
-/captures
+captures/
 .externalNativeBuild
 .cxx
+
+# IDE.
+.idea/
+.kotlin/
+
+# Local SDK path, machine-specific.
+local.properties
+
+# OS junk.
+.DS_Store
+Thumbs.db
+
+# Binaries.
 *.apk
 *.aab
 *.keystore
 *.jks
-
-# Private planning docs — kept on disk only, never committed.
-/STATUS.md
-/Project Plan/
-/CLAUDE_CODE_TASK.md
-
-# Author's source CSV files — the bundled, renamed copies live in
-# app/src/main/assets/default_decks/ and are public; the raw author folder is not.
-/Domyslne fiszki na start/
-
-# Raw phone photos of the Kompakt screen — author's working folder.
-# Only the cleaned, renamed screenshots in docs/screenshots/ ship publicly.
-/docs/screenshots/surowe/
