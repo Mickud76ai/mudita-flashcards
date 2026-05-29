@@ -27,14 +27,14 @@ Older versions and changelogs live on the [Releases page](https://github.com/Mic
 
 ## How to use
 
-1. Open the app. The home screen shows the `Flashcards/` folder. Folders are prefixed `▸`, decks `≡`.
+1. Open the app. The home screen shows the contents of the `Flashcards/` folder. Folders appear above decks.
 2. Tap a deck, then *Start Session*.
 3. In a session:
    - tap *Flip the card* (or tap the card body) to see the back,
-   - tap the round ✗ button to mark a card as hard,
-   - tap the round ✓ button to mark it as known,
-   - leave with × in the top bar whenever you want.
-4. The gear icon (⚙) on the home screen opens Settings: persistence between sessions, card order, deep refresh, delete decks.
+   - tap the round button on the bottom left to mark a card as hard,
+   - tap the round button on the bottom right to mark it as known,
+   - leave with the close button in the top bar whenever you want.
+4. The Settings icon on the home screen opens Settings: persistence between sessions, card order, deep refresh, delete decks.
 
 A few starter decks install on first launch: Polish sailing terminology (`Zeglarz_Jachtowy/`), English irregular verbs and phrasal verbs (`Angielski/`), digestive enzymes.
 
