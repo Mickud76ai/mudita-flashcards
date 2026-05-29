@@ -38,7 +38,7 @@ A calm, deliberate flashcards app for the [Mudita Kompakt](https://mudita.com/pr
 
 ## Download and install
 
-A pre-built APK is attached to every [GitHub Release](https://github.com/Mickud76ai/mudita-flashcards/releases). The current release for the Mudita Mindful App Design Challenge is **[v1.0.0](https://github.com/Mickud76ai/mudita-flashcards/releases/tag/v1.0.0)**; download `mudita-flashcards-1.0-debug.apk` from the *Assets* section.
+A pre-built APK is attached to every [GitHub Release](https://github.com/Mickud76ai/mudita-flashcards/releases). The current release for the Mudita Mindful App Design Challenge is **[v1.0.1](https://github.com/Mickud76ai/mudita-flashcards/releases/tag/v1.0.1)**; download `mudita-flashcards-1.0-debug.apk` from the *Assets* section.
 
 To install on a Mudita Kompakt:
 
@@ -54,7 +54,7 @@ If you would rather build from source, see [Building from source](#building-from
 
 For jury members and anyone evaluating the app:
 
-1. Download `mudita-flashcards-1.0-debug.apk` from [Releases](https://github.com/Mickud76ai/mudita-flashcards/releases/tag/v1.0.0) and sideload onto a Mudita Kompakt via Mudita Center or WebADB (see [Download and install](#download-and-install) for the full instructions).
+1. Download `mudita-flashcards-1.0-debug.apk` from [Releases](https://github.com/Mickud76ai/mudita-flashcards/releases/tag/v1.0.1) and sideload onto a Mudita Kompakt via Mudita Center or WebADB (see [Download and install](#download-and-install) for the full instructions).
 2. Open the app, tap *Open settings* on the permission screen, grant *All files access*, return to the app.
 3. The app installs starter decks on first launch: Polish sailing terminology (folder `Zeglarz_Jachtowy/`), English irregular verbs and phrasal verbs (folder `Angielski/`), digestive enzymes. Tap into a folder, pick a deck (for example *English Irregular Verbs*), then tap *Start Session*.
 4. The session has no end. Leave whenever you choose, with the × in the top bar.
